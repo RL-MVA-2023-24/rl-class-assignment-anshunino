@@ -1,5 +1,8 @@
 from gymnasium.wrappers import TimeLimit
 from env_hiv import HIVPatient
+import numpy as np
+import torch.nn as nn
+import torch
 
 env = TimeLimit(
     env=HIVPatient(domain_randomization=False), max_episode_steps=200
@@ -11,11 +14,27 @@ env = TimeLimit(
 # Don't modify the methods names and signatures, but you can add methods.
 # ENJOY!
 class ProjectAgent:
+    def __init__(self):
+        n_neurons = 32
+        self.best_model = torch.nn.Sequential(nn.Linear(6, n_neurons),
+                          nn.ReLU(),
+                          nn.Linear(n_neurons, n_neurons),
+                          nn.ReLU(), 
+                          nn.Linear(n_neurons, n_neurons),
+                          nn.ReLU(), 
+                          nn.Linear(n_neurons, 4))
+
     def act(self, observation, use_random=False):
-        return 0
+        Q = self.best_model(torch.Tensor(observation).unsqueeze(0))
+        return torch.argmax(Q).item()
 
     def save(self, path):
         pass
 
     def load(self):
-        pass
+        # load best model state dict from pickle
+        import pickle
+        with open('env_model.pkl', 'rb') as f:
+            best_model_state_dict = pickle.load(f)
+
+        self.best_model.load_state_dict(best_model_state_dict)
