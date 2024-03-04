@@ -15,18 +15,16 @@ env = TimeLimit(
 # ENJOY!
 class ProjectAgent:
     def __init__(self):
-        n_neurons = 32
-        self.best_model = torch.nn.Sequential(nn.Linear(6, n_neurons),
+        hidden_size = 512
+        self.best_model = torch.nn.Sequential(nn.Linear(6, hidden_size),
                           nn.ReLU(),
-                          nn.Linear(n_neurons, n_neurons),
-                          nn.ReLU(), 
-                          nn.Linear(n_neurons, n_neurons),
-                          nn.ReLU(), 
-                          nn.Linear(n_neurons, 4))
+                          nn.Linear(hidden_size, hidden_size),
+                          nn.ReLU(),
+                          nn.Linear(hidden_size, 4))
 
     def act(self, observation, use_random=False):
-        Q = self.best_model(torch.Tensor(observation).unsqueeze(0))
-        return torch.argmax(Q).item()
+        Q_func = self.best_model(torch.Tensor(observation).unsqueeze(0))
+        return torch.argmax(Q_func).item()
 
     def save(self, path):
         pass
@@ -34,8 +32,9 @@ class ProjectAgent:
     def load(self):
         # load best model state dict from pickle
         import pickle
-        #with open('env_model.pkl', 'rb') as f:
-        #    self.best_model = pickle.load(f)
+        with open('model_3_layer_512.pkl', 'rb') as f:
+            best_model_state_dict = pickle.load(f)
+            #self.best_model = pickle.load(f)
 
         #self.best_model.to(device=torch.device('cpu'))
-        self.best_model = torch.load('env_model.pkl',map_location=torch.device('cpu'))
+        self.best_model.load_state_dict(best_model_state_dict)
