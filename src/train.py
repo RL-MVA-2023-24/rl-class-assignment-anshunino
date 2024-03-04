@@ -34,7 +34,7 @@ class ProjectAgent:
     def load(self):
         # load best model state dict from pickle
         import pickle
-        with open('models\env_model_2.pkl', 'rb') as f:
+        with open('env_model.pkl', 'rb') as f:
             self.best_model = pickle.load(f)
 
         self.best_model.to(device=torch.device('cpu'))
